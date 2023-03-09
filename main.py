@@ -2,34 +2,30 @@ from __future__ import print_function
 
 from lxml import html
 import requests
-import csv
+import re
 
 
 if __name__ == '__main__':
-    headers = {"Accept-Language": "en-US,en;q=0.5"}
-    with open("./builtwith-top1m-20230221.csv", 'r') as file:
-        with open('./index.txt', 'w') as index:
-            csvreader = csv.reader(file)
-            i = 1
-            final_output = ''
-            for row in csvreader:
-                try:
-                    if i > 100:
-                        break
-                    url = 'https://' + row[1]
-                    r = requests.get(url, headers=headers, timeout=5)
-                    r.encoding = 'utf-8'
+    HEADERS = {"Accept-Language": "ru-RU,ru;q=0.5"}
+    DOWNLOAD_URL = 'https://4pda.to/page/'
+    PAGE = 1
 
-                    if r.status_code != 200:
-                        continue
+    urls = set()
 
-                    if len(html.fromstring(r.text).text_content()) < 1000:
-                        continue
+    while len(urls) < 10:
+        r = requests.get(DOWNLOAD_URL + str(PAGE), headers=HEADERS, timeout=5)
+        r.encoding = 'windows-1251'
+        res = html.fromstring(r.text)
+        for (element, attr, link, position) in html.iterlinks(res):
+            if re.match(r'https://4pda\.to/\d', link):
+                urls.add(link)
+        PAGE += 1
 
-                    with open('./' + str(i) + '.html', 'w') as htmtext:
-                        htmtext.write(r.text)
-                        final_output += str(i) + ' - ' + url + '\n'
-                        i += 1
-                except:
-                    continue
-            index.write(final_output)
+    open('./index.txt', 'w').close()
+    with open('./index.txt', 'a') as index:
+        for idx, url in enumerate(urls):
+            r = requests.get(url, headers=HEADERS, timeout=5)
+            r.encoding = 'windows-1251'
+            with open('./' + str(idx) + '.html', 'w', encoding='utf-8') as html:
+                html.write(r.text)
+                index.write(str(idx) + ' - ' + url + '\n')
