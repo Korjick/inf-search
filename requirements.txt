@@ -1,3 +1,5 @@
 lxml
 requests
 natasha
+bs4
+pymorphy2
