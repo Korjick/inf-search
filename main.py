@@ -21,11 +21,11 @@ if __name__ == '__main__':
             for script in soup(["script", "style"]):
                 script.extract()
 
-            text = soup.get_text()
+            text = soup.get_text(separator='\n')
             text = re.sub(r'[^\w\s]', '', text)
             lines = (line.strip() for line in text.splitlines())
             chunks = (phrase.strip() for line in lines for phrase in line.split(" "))
-            text = ' '.join(chunk for chunk in chunks if morph.parse(chunk)[0].tag.POS not in REMOVE_MORPH and len(chunk) > 0)
+            text = ' '.join(chunk.lower() for chunk in chunks if morph.parse(chunk)[0].tag.POS not in REMOVE_MORPH and len(chunk) > 0 and not any(char.isdigit() for char in chunk))
             doc = Doc(text)
             doc.segment(segmenter)
             doc.tag_morph(morph_tagger)
