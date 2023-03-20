@@ -3,3 +3,4 @@ requests
 natasha
 bs4
 pymorphy2
+simplejson
