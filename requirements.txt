@@ -4,3 +4,5 @@ natasha
 bs4
 pymorphy2
 simplejson
+pandas
+scikit-learn
