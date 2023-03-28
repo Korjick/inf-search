@@ -12,7 +12,7 @@ def pure_text_from_html(path):
         for script in soup(["script", "style"]):
             script.extract()
 
-        text = soup.get_text(separator='\n')
+        text = soup.select('.container')[0].get_text(separator='\n')
         text = re.sub(r'[^\w\s]', '', text)
         lines = (line.strip() for line in text.splitlines())
         chunks = (phrase.strip() for line in lines for phrase in line.split(" "))
