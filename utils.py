@@ -5,7 +5,7 @@ import pymorphy2
 from natasha import (Doc, MorphVocab, Segmenter, NewsEmbedding, NewsMorphTagger)
 
 def pure_text_from_html(path):
-    remove_morph = ['PREP', 'CONJ', 'PRCL', 'INTJ']
+    remove_morph = ['PRON', 'CONJ', 'ADP', 'INTJ']
     morph = pymorphy2.MorphAnalyzer()
     with open(path, 'r', encoding='utf-8') as file:
         soup = BeautifulSoup(file.read(), features="html.parser")
