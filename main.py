@@ -11,12 +11,12 @@ import json
 if __name__ == '__main__':
 
     # Save our lemmas to json format
-    # final = utils.html_lemma()
-    # utils.dict_to_json(final)
+    final = utils.html_lemma()
+    utils.dict_to_json(final)
 
-    test = utils.json_to_dict()
-    word = 'напомним'
-    word_doc = utils.word_to_lemmas_doc(word)
-    for token in word_doc.tokens:
-        print(token.lemma)
+    # test = utils.json_to_dict()
+    # word = 'напомним'
+    # word_doc = utils.word_to_lemmas_doc(word)
+    # for token in word_doc.tokens:
+    #     print(token.lemma)
 
