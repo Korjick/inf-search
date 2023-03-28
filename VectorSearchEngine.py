@@ -1,75 +1,70 @@
 import json
-import numpy as np
 import os
+import math
 
 
-# define function to vectorize a query
-def vectorize_query(query):
-    vector = np.zeros(len(vocabulary))
-    for word in query.split():
-        if word in vocabulary:
-            vector[list(vocabulary).index(word)] += 1
-    return vector / np.linalg.norm(vector)
+class VectorSearchEngine():
+    def __init__(self):
+        # Step 1: Load JSON file
+        with open('inverted_index.json', 'r', encoding='utf-8') as f:
+            self.data = json.load(f)
+
+        # Step 2: Load tf-idf scores
+        self.tf_idf = {}
+        for i in range(128):
+            filename = f'tf-idf-lms/tf_idf_lms_{i}.txt'
+            with open(filename, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                scores = {}
+                for line in lines:
+                    word, tf, tf_idf_score = line.split()
+                    scores[word] = float(tf_idf_score)
+                self.tf_idf[str(i)] = scores
+
+        # Step 3: Create vocabulary
+        self.vocab = set()
+        for d in self.data.keys():
+            self.vocab.add(d)
+
+        # Step 4: Calculate IDF
+        self.idf = {}
+        N = len(self.tf_idf)
+        for word in self.vocab:
+            count = sum(1 for i in self.tf_idf if word in self.tf_idf[i])
+            self.idf[word] = math.log(N / count)
+
+        # Step 5: Load URLS
+        self.indexes = []
+        with open('index.txt', 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.rstrip()
+                line = line.split(' - ')
+                self.indexes.append(line[1])
+
+    def search(self, query):
+        tokens = query.split()
+        query_tf_idf = {}
+        for word in tokens:
+            if word in self.vocab:
+                query_tf_idf[word] = self.idf[word] * (tokens.count(word) / len(tokens))
+
+        results = []
+        for doc_id in self.tf_idf:
+            doc_tf_idf = self.tf_idf[doc_id]
+            numerator = sum(doc_tf_idf.get(w, 0) * query_tf_idf.get(w, 0) for w in self.vocab)
+            denominator = math.sqrt(sum(v ** 2 for v in doc_tf_idf.values())) * math.sqrt(
+                sum(v ** 2 for v in query_tf_idf.values()))
+            similarity = numerator / denominator if denominator != 0 else 0
+            results.append((doc_id, similarity))
+
+        results.sort(key=lambda x: x[1], reverse=True)
+        return [self.indexes[int(x[0])] for x in results]
 
 
-# define function to rank documents based on cosine similarity
-def rank_documents(query_vector):
-    scores = matrix_norm.dot(query_vector)
-    ranked_indices = np.argsort(scores)[::-1]
-    return ranked_indices
-
-
+# Step 6: Search for documents
 if __name__ == '__main__':
-    # load json file containing word/page metadata into Python object
-    with open('inverted_index.json', 'r', encoding='utf-8') as f:
-        word_metadata = json.load(f)
-    word_metadata = list(word_metadata.values())
-
-    # load list of files with TF-IDF scores
-    tfidf_files = ['tf-idf-lms/tf_idf_lms_{}.txt'.format(i) for i in range(100)]
-    tfidf_lists = []
-    for filename in tfidf_files:
-        with open(filename, 'r', encoding='utf-8') as f:
-            tfidf_list = []
-            for line in f:
-                word, tf_score, tf_idf_score = line.strip().split()
-                tfidf_list.append(float(tf_idf_score))
-            tfidf_lists.append(tfidf_list)
-
-    # create vocabulary list
-    vocabulary = set()
-    for tfidf_list in tfidf_lists:
-        for i, score in enumerate(tfidf_list):
-            if score > 0:
-                word = word_metadata[i]["lemma"]
-                vocabulary.add(word)
-
-    # create matrix of TF-IDF weights
-    matrix = np.zeros((len(tfidf_lists), len(vocabulary)))
-    for i, tfidf_list in enumerate(tfidf_lists):
-        for j, score in enumerate(tfidf_list):
-            if score > 0:
-                word = word_metadata[j]["lemma"]
-                matrix[i, list(vocabulary).index(word)] = score
-
-    # normalize rows of matrix to have unit length
-    norms = np.linalg.norm(matrix, axis=1)
-    norms[norms == 0] = 1
-    matrix_norm = matrix / norms[:, np.newaxis]
-
-    # given a query, vectorize it and rank the documents
-    query = "microsoft"
-    query_vector = vectorize_query(query)
-    ranked_indices = rank_documents(query_vector)
-
-    indexes = {}
-    with open('index.txt', 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-        for line in lines:
-            line = line.rstrip().split(' - ')
-            indexes[int(line[0])] = line[1]
-
-    # print the top 10 results
-    for i in range(10):
-        filename = indexes[ranked_indices[i]]
-        print("Rank {}: {}".format(i+1, os.path.splitext(filename)[0]))
+    query = 'сталкер дубляж'
+    vecSearch = VectorSearchEngine()
+    result = vecSearch.search(query)
+    print(result)
