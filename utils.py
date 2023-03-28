@@ -28,7 +28,7 @@ def word_to_lemmas_doc(word, segmenter=Segmenter(), morph_vocab=MorphVocab(), em
 }
 """
 def html_lemma(total_pages=128, root_path='./sites/'):
-    remove_morph = ['PREP', 'CONJ', 'PRCL', 'INTJ']
+    remove_morph = ['PRON', 'CONJ', 'ADP', 'INTJ']
     morph = pymorphy2.MorphAnalyzer()
     final = dict()
     for i in range(total_pages):
