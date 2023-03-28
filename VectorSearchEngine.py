@@ -71,5 +71,5 @@ if __name__ == '__main__':
 
     # print the top 10 results
     for i in range(10):
-        filename = indexes[ranked_indices[i] + 1]
+        filename = indexes[ranked_indices[i]]
         print("Rank {}: {}".format(i+1, os.path.splitext(filename)[0]))
