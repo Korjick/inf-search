@@ -7,7 +7,7 @@ from natasha import (Doc, MorphVocab, Segmenter, NewsEmbedding, NewsMorphTagger)
 
 if __name__ == '__main__':
     TOTAL_PAGES = 128
-    REMOVE_MORPH = ['PREP', 'CONJ', 'PRCL', 'INTJ']
+    REMOVE_MORPH = ['PRON', 'CONJ', 'ADP', 'INTJ']
     morph = pymorphy2.MorphAnalyzer()
     segmenter = Segmenter()
     morphVocab = MorphVocab()
