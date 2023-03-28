@@ -1,7 +1,5 @@
 import math
 
-from utils import pure_text_from_html
-
 
 def calculate_tf(text, vocab):
     words = text.split()
