@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Поисковая система</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
+</head>
+<body>
+<div id="cover">
+    <form method="GET" action="/">
+        <div class="tb">
+            <div class="td"><label for="query">Введите запрос</label>
+                <input id="query" type="search" name="q" value="{{q}}"></div>
+            <div class="td" id="s-cover">
+                <button type="submit">Найти</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% if result %}
+<h3>Результат поиска:</h3>
+{% for item in result %}
+<p>
+    <!--            {{ item.1 }}<br>-->
+    <a href="{{ item }}">{{ item }}</a>
+</p>
+{% endfor %}
+{% endif %}
+</body>
+</html>
